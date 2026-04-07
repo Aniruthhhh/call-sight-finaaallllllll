@@ -16,7 +16,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  outputFileTracingRoot: path.resolve(__dirname, '../../'),
+  // Only set outputFileTracingRoot in local/Orchids dev — NOT on Vercel
+  ...(process.env.VERCEL ? {} : {
+    outputFileTracingRoot: path.resolve(__dirname, '../../'),
+  }),
   typescript: {
     ignoreBuildErrors: true,
   },
