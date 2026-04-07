@@ -3,6 +3,8 @@ import path from "node:path";
 
 const LOADER = path.resolve(__dirname, 'src/visual-edits/component-tagger-loader.js');
 
+const isVercel = !!process.env.VERCEL;
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -16,10 +18,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Only set outputFileTracingRoot in local/Orchids dev — NOT on Vercel
-  ...(process.env.VERCEL ? {} : {
-    outputFileTracingRoot: path.resolve(__dirname, '../../'),
-  }),
+  // Only apply Orchids-specific tracing root in local dev, not on Vercel
+  ...(isVercel ? {} : { outputFileTracingRoot: path.resolve(__dirname, '../../') }),
   typescript: {
     ignoreBuildErrors: true,
   },
