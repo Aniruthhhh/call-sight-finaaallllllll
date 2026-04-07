@@ -8,9 +8,57 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Phone, Search, History, MessageSquare, Clock } from 'lucide-react'
+import { Phone, Search, History, MessageSquare, Clock, FileText } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
+
+function LeadTranscriptButton({ leadId }: { leadId: string }) {
+  const [pdfs, setPdfs] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch(`/api/transcripts/list?leadId=${leadId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.files) setPdfs(data.files)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [leadId])
+
+  if (loading || pdfs.length === 0) return null
+
+  if (pdfs.length === 1) {
+    return (
+      <a href={pdfs[0].url} target="_blank" rel="noreferrer" className="text-blue-600 hover:bg-blue-100 text-[10px] font-bold flex items-center gap-1 border border-blue-200 bg-blue-50 px-2 py-1.5 rounded transition-colors mr-2">
+        <FileText className="w-3 h-3" /> VIEW PDF
+      </a>
+    )
+  }
+
+  return (
+    <div className="mr-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="text-blue-600 hover:bg-blue-100 text-[10px] font-bold flex items-center gap-1 border border-blue-200 bg-blue-50 px-2 py-1.5 rounded outline-none transition-colors">
+            <FileText className="w-3 h-3" /> PDFS ({pdfs.length})
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {pdfs.map((pdf, idx) => (
+            <DropdownMenuItem key={idx} asChild>
+              <a href={pdf.url} target="_blank" rel="noreferrer" className="text-xs cursor-pointer w-full inline-block">
+                {pdf.date}
+              </a>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  )
+}
+
 
 export default function MyLeadsPage() {
   const { user } = useAuth()
@@ -117,7 +165,8 @@ export default function MyLeadsPage() {
                           {lead.last_contact ? new Date(lead.last_contact).toLocaleDateString() : 'Never'}
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className="flex justify-end items-center">
+                            <LeadTranscriptButton leadId={lead.id} />
                             <Link href={`/dashboard/executive/dialer?leadId=${lead.id}`}>
                               <Button size="sm" className="bg-blue-600 hover:bg-blue-700 h-8 font-bold text-[11px] uppercase">
                                 <Phone className="w-3 h-3 mr-1" /> Call

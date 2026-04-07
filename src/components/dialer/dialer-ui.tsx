@@ -172,8 +172,33 @@ export function DialerUI({ lead, onCallComplete }: { lead: any, onCallComplete: 
       return
     }
 
+    const compileTranscriptText = () => {
+      return transcripts.map(t => `[${t.role.toUpperCase()}] ${t.text}`).join('\n\n');
+    }
+
     try {
       const { data: { session } } = await supabase.auth.getSession()
+
+      // Save PDF Transcript if there is any text gathered
+      if (transcripts.length > 0) {
+        toast.loading('Generating transcript PDF...', { id: 'pdf-toast' })
+        try {
+          await fetch('/api/transcripts/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              leadId: lead.id,
+              leadName: lead.name,
+              phoneNumber: lead.phone,
+              callSid: callId,
+              transcriptText: compileTranscriptText()
+            })
+          })
+          toast.success('Transcript securely saved.', { id: 'pdf-toast' })
+        } catch (e) {
+          toast.error('Failed formatting PDF, but log will save.', { id: 'pdf-toast' })
+        }
+      }
 
       const response = await fetch('/api/calls/end', {
         method: 'POST',
