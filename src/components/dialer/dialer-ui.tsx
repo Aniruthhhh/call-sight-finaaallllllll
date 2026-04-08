@@ -220,6 +220,28 @@ export function DialerUI({ lead, onCallComplete }: { lead: any, onCallComplete: 
 
       toast.success('Call logged successfully')
       onCallComplete()
+
+      // Fire-and-forget: Save to Call Logs (non-blocking)
+      const callEndTime = new Date().toISOString()
+      fetch('/api/call-logs/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({
+          leadId: lead.id,
+          leadName: lead.name,
+          phoneNumber: lead.phone,
+          callSid: callId,
+          duration,
+          outcome,
+          transcriptText: transcripts.map(t => `[${t.role.toUpperCase()}] ${t.text}`).join('\n\n') || '',
+          callStartTime: new Date(Date.now() - duration * 1000).toISOString(),
+          callEndTime
+        })
+      }).catch(e => console.warn('Call log save failed (non-critical):', e))
+
       resetDialer()
     } catch (error: any) {
       toast.error(error.message)

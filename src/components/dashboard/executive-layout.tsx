@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Phone, Calendar, History, LogOut, Menu, X, Bell, LayoutDashboard, Users, Shield } from 'lucide-react'
+import { Phone, Calendar, History, LogOut, Menu, X, Bell, LayoutDashboard, Users, Shield, FileText } from 'lucide-react'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
@@ -29,6 +29,7 @@ export const ExecutiveLayout = ({ children }: { children: React.ReactNode }) => 
     { name: 'Dialer', icon: Phone, href: '/dashboard/executive/dialer' },
     { name: 'Follow-ups', icon: Calendar, href: '/dashboard/executive/follow-ups' },
     { name: 'Performance', icon: History, href: '/dashboard/executive/performance' },
+    { name: 'Call Logs', icon: FileText, href: '/dashboard/executive/call-logs' },
   ]
 
   return (
