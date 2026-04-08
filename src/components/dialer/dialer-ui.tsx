@@ -33,7 +33,7 @@ export function DialerUI({ lead, onCallComplete }: { lead: any, onCallComplete: 
 
     const isSocketConnectedRef = useRef(false) // optional but better track
     const isCallActiveRef = useRef(false)
-    const timerRef = useRef<NodeJS.Timeout | null>(null)
+    const timerRef = useRef<any>(null)
 
   useEffect(() => {
     if (callState === 'connected' || callState === 'calling') {
